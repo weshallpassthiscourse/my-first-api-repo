@@ -14,19 +14,28 @@ graph TD
 
     Check -- Yes --> Accept[Payment Provider accepts card]
     
+    %% Hier starten BEIDE Aktionen gleichzeitig (Parallel)
     Accept --> SendOrder[Cash Register sends order to Barista]
     Accept --> Print[Cash Register prints receipt]
     
+    %% Strang 1: Kassierer & Kunde
     Print --> GiveReceipt[Cashier gives receipt to Customer]
+    GiveReceipt --> Wait[Customer waits for coffee]
     
+    %% Strang 2: Barista
     SendOrder --> Make[Barista makes coffee]
     Make --> Pass[Barista passes coffee to Handler]
-    Pass --> HandOver[Handler hands coffee to Customer]
+    
+    %% Frühere Zusammenführung: Der wartende Kunde und der fertige Kaffee treffen sich
+    Wait --> HandOver[Handler hands coffee to Customer]
+    Pass --> HandOver
     
     HandOver --> Finish([Order Complete])
-
+    
+    %% Alternativer Strang (Abbruch)
     Check -- No --> Reject[Payment Provider rejects card]
     Reject --> RejectPay[Cash Register rejects payment]
     RejectPay --> Cancel[Cashier cancels order]
     
     Cancel --> FinishFailed([Order Cancelled])
+
